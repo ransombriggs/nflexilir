@@ -1,17 +1,19 @@
 defmodule Nflexilir do
-  def json_files do
-    json_dir = "lib/gamecenter-json.json"
-    {:ok, files} = File.ls(json_dir)
-    Enum.filter(files, fn(x) -> String.starts_with?(x, "2013") end)
+
+  def schedule do
+    {:ok, json} = JSON.decode(File.read!("lib/data.json"))
+    Enum.filter(json, fn(x) -> 
+      Dict.fetch!(x, "year") == 2012 && Dict.fetch!(x, "season_type") == "REG"
+    end)
   end
 
   def json_objects do
-    Enum.map(json_files, fn(x) ->
-      filename = "lib/gamecenter-json.json/#{x}"
+    Enum.map(Nflexilir.schedule, fn(x) ->
+      eid = Dict.fetch!(x, "eid")
+      filename = "lib/gamecenter-json.json/#{eid}.json"
       {:ok, json} = JSON.decode(File.read!(filename))
 
-      key = Enum.fetch!(Regex.run(%r/^([0-9]+)\.json$/, x), 1)
-      Dict.fetch!(json, key)
+      Dict.fetch!(json, eid)
     end)
   end
 
