@@ -1,18 +1,26 @@
 defmodule Nflexilir do
 
   def schedule do
+    IO.puts "[start] schedule"
     {:ok, json} = JSON.decode(File.read!("lib/data.json"))
+    IO.puts "[end] schedule"
     Enum.filter(json, fn(x) -> 
       Dict.fetch!(x, "season") == 2012 && Dict.fetch!(x, "season_type") == "REG"
     end)
   end
 
   def json_objects do
-    Enum.map(Nflexilir.schedule, fn(x) ->
+    schedule = Nflexilir.schedule
+    IO.puts "[schedule] "
+    IO.inspect Enum.count(schedule)
+    Enum.map(Enum.with_index(schedule), fn(pair) ->
+      {x, i} = pair
       eid = Dict.fetch!(x, "eid")
       filename = "lib/gamecenter-json.json/#{eid}.json"
       {:ok, json} = JSON.decode(File.read!(filename))
 
+      IO.puts "[i] "
+      IO.inspect i
       Dict.fetch!(json, eid)
     end)
   end
