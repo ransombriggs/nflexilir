@@ -25,6 +25,7 @@ defmodule Nflexilir do
             v3
           else 
             IO.inspect(v3 <> " is not equal to " <> v4)
+            v3
           end
         else
           v3 + v4
@@ -37,7 +38,17 @@ defmodule Nflexilir do
     Enum.reduce(f, HashDict.new(), fn(x, acc1) ->
       places = Enum.reduce(["home", "away"], HashDict.new(), fn(t, acc2) ->
         case HashDict.fetch(HashDict.fetch!(HashDict.fetch!(x, t), "stats"), attr) do
-          {:ok, attr_hash} -> Nflexilir.merge(acc2, attr_hash)
+          {:ok, attr_hash} -> 
+            if (attr == "puntret" || attr == "kickret") do
+              attr_hash = Enum.reduce(Dict.keys(attr_hash), HashDict.new, fn(player, pacc) ->
+                stats = Dict.fetch!(attr_hash, player)
+                {average, stats} = Dict.pop(stats, "avg")
+                {ret, stats} = Dict.pop(stats, "ret")
+                stats = Dict.put(stats, "tot", average * ret)
+                Dict.put(pacc, player, stats)
+              end)
+            end
+            Nflexilir.merge(acc2, attr_hash)
           :error -> Nflexilir.merge(acc2, HashDict.new)
         end
       end)
@@ -87,12 +98,12 @@ defmodule Nflexilir do
         end
       }, {
         "kickret", fn(h) ->
-          Dict.fetch!(h, "ret") * Dict.fetch!(h, "avg") * 0.03 + 
+          Dict.fetch!(h, "tot") * 0.03 + 
           Dict.fetch!(h, "tds") * 6
         end
       }, {
         "puntret", fn(h) ->
-          Dict.fetch!(h, "ret") * Dict.fetch!(h, "avg") * 0.03 + 
+          Dict.fetch!(h, "tot") * 0.03 + 
           Dict.fetch!(h, "tds") * 6
         end
       }, {
