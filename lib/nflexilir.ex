@@ -28,7 +28,7 @@ defmodule Nflexilir do
   def merge(d1, d2) do
     Dict.merge(d1, d2, fn(_k, v1, v2) ->                                                
       Dict.merge(v1, v2, fn(_k2, v3, v4) ->
-        if (_k2 == "name") do
+        if (_k2 == "name" || _k2 == "clubcode" || _k2 == "playerName") do
           if (v3 == v4) do
             v3
           else 
@@ -44,28 +44,74 @@ defmodule Nflexilir do
 
   def merge_away_home_and_attr(f, attr) do
     Enum.reduce(f, HashDict.new(), fn(x, acc1) ->
-      places = Enum.reduce(["home", "away"], HashDict.new(), fn(t, acc2) ->
-        case HashDict.fetch(HashDict.fetch!(HashDict.fetch!(x, t), "stats"), attr) do
-          {:ok, attr_hash} -> 
-            if (attr == "puntret" || attr == "kickret") do
-              attr_hash = Enum.reduce(Dict.keys(attr_hash), HashDict.new, fn(player, pacc) ->
-                stats = Dict.fetch!(attr_hash, player)
-                {average, stats} = Dict.pop(stats, "avg")
-                {ret, stats} = Dict.pop(stats, "ret")
-                stats = Dict.put(stats, "tot", average * ret)
-                Dict.put(pacc, player, stats)
-              end)
-            end
-            Nflexilir.merge(acc2, attr_hash)
-          :error -> Nflexilir.merge(acc2, HashDict.new)
-        end
-      end)
-      Nflexilir.merge(acc1, places)
+      if (attr == "kicking") do
+        # {"00-0020305": {"att": 24}}
+        drives = Dict.fetch!(x, "drives")
+        drives_hash = Enum.reduce(Dict.keys(drives), HashDict.new(), fn(drive_key, acc2) ->
+          if (drive_key == "crntdrv") do
+            acc2
+          else
+            plays = Dict.fetch!(Dict.fetch!(drives, drive_key), "plays")
+            plays_hash = Enum.reduce(Dict.keys(plays), HashDict.new(), fn(play_key, acc3) ->
+              play_hash = Dict.fetch!(plays, play_key)
+              if (Dict.fetch!(play_hash, "note") == "FG") do
+                players_hash = Dict.fetch!(play_hash, "players")
+                player_keys = Dict.keys(players_hash)
+                kickers = Enum.filter(player_keys, fn(x) -> 
+                  kicker_array = Dict.fetch!(players_hash, x)
+                  Enum.any?(kicker_array, fn(y) -> Dict.fetch!(y, "statId") == 70 end)
+                end)
+                if (Enum.count(kickers) != 1) do
+                  IO.inspect players_hash
+                  raise "More than one player participated in a field goal?"
+                end
+                player_id = Enum.fetch!(kickers, 0)
+                players_array = Dict.fetch!(players_hash, player_id)
+                if (Enum.count(kickers) != 1) do
+                  raise "More than one play in a field goal?"
+                end
+                kicking_stats = Enum.fetch!(players_array, 0)
+                yds = Dict.fetch!(kicking_stats, "yards")
+                converted_stats = HashDict.new([{"fg0", 0}, {"fg40", 0}, {"fg50", 0}, {"playerName", Dict.fetch!(kicking_stats, "playerName")}])
+                key = cond do
+                  yds < 40 -> "fg0"
+                  yds < 50 -> "fg40"
+                  true -> "fg50"
+                end
+                converted_stats = Dict.put(converted_stats, key, 1)
+                Nflexilir.merge(acc3, HashDict.new([{player_id, converted_stats}]))
+              else
+                acc3
+              end
+            end)
+            Nflexilir.merge(acc2, plays_hash)
+          end
+        end)
+        Nflexilir.merge(acc1, drives_hash)
+      else 
+        places = Enum.reduce(["home", "away"], HashDict.new(), fn(t, acc2) ->
+          case HashDict.fetch(HashDict.fetch!(HashDict.fetch!(x, t), "stats"), attr) do
+            {:ok, attr_hash} -> 
+              if (attr == "puntret" || attr == "kickret") do
+                attr_hash = Enum.reduce(Dict.keys(attr_hash), HashDict.new, fn(player, pacc) ->
+                  stats = Dict.fetch!(attr_hash, player)
+                  {average, stats} = Dict.pop(stats, "avg")
+                  {ret, stats} = Dict.pop(stats, "ret")
+                  stats = Dict.put(stats, "tot", average * ret)
+                  Dict.put(pacc, player, stats)
+                end)
+              end
+              Nflexilir.merge(acc2, attr_hash)
+            :error -> Nflexilir.merge(acc2, HashDict.new)
+          end
+        end)
+        Nflexilir.merge(acc1, places)
+      end
     end)
   end
 
   def merge_all_stats(f) do
-    Enum.reduce(["passing", "rushing", "receiving", "kickret", "puntret", "fumbles"], HashDict.new(), fn(stat, acc) ->
+    Enum.reduce(["passing", "rushing", "receiving", "kickret", "puntret", "fumbles", "kicking"], HashDict.new(), fn(stat, acc) ->
       stats = Nflexilir.merge_away_home_and_attr(f, stat)
       player_stats = Enum.reduce(Dict.keys(stats), HashDict.new, fn(player, acc2) ->
         stat_hash = Dict.fetch!(stats, player)
@@ -121,6 +167,12 @@ defmodule Nflexilir do
           # Fumble Return TD (FRTD)
           Dict.fetch!(h, "tot") * -1
         end
+      }, {
+        "kicking", fn(h) ->
+          Dict.fetch!(h, "fg0") * 3 +
+          Dict.fetch!(h, "fg40") * 4 + 
+          Dict.fetch!(h, "fg50") * 5
+        end
       }
     ]
 
@@ -143,10 +195,13 @@ defmodule Nflexilir do
 
       Dict.put(player_dict, "projection", projection_dict)
     end)
-
-    Enum.sort(points, fn(a, b) -> 
-      atotal = Dict.fetch!(Dict.fetch!(a, "projection"), "total")
-      btotal = Dict.fetch!(Dict.fetch!(b, "projection"), "total")
+    sort_players_by_key(points, "total")
+  end
+  
+  def sort_players_by_key(p, key) do
+    Enum.sort(p, fn(a, b) -> 
+      atotal = Dict.fetch!(Dict.fetch!(a, "projection"), key)
+      btotal = Dict.fetch!(Dict.fetch!(b, "projection"), key)
       atotal > btotal
     end)
   end
