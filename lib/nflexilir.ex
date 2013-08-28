@@ -3,7 +3,7 @@ defmodule Nflexilir do
   def schedule do
     {:ok, json} = JSON.decode(File.read!("lib/data.json"))
     Enum.filter(json, fn(x) -> 
-      Dict.fetch!(x, "year") == 2012 && Dict.fetch!(x, "season_type") == "REG"
+      Dict.fetch!(x, "season") == 2012 && Dict.fetch!(x, "season_type") == "REG"
     end)
   end
 
