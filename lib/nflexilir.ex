@@ -60,7 +60,12 @@ defmodule Nflexilir do
           :error -> Nflexilir.merge(acc2, HashDict.new)
         end
       end)
-      Nflexilir.merge(acc1, places)
+      score_summary = Dict.fetch!(x, "scrsummary")
+      kicking_dict = Enum.reduce(Dict.keys(score_summary), HashDict.new, fn(scr, kacc) -> 
+        #IO.inspect(Dict.fetch!(score_summary, scr))
+        kacc
+      end)
+      Nflexilir.merge(acc1, Nflexilir.merge(places, kicking_dict))
     end)
   end
 
