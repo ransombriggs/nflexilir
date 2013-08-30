@@ -9,43 +9,45 @@
     <h1>Available players</h1>
     <%= link_to 'Projection', players_path(order: 'proj') %> |
     <%= link_to 'Statistics', players_path(order: 'stats') %>
-    <table>
-      <thead>
-        <tr>
-          <th>ESPN ID</th>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Team</th>
-          <th>Stat</th>
-          <th>Projection</th>
-          <th>&nbsp;</th>
-          <th>&nbsp;</th>
-        </tr>
-      </thead>
-    
-      <tbody>
-        <% @available_players.each do |player| %>
+    <% [@available_players, @highest_ranked].each do |array| %>
+      <table>
+        <thead>
           <tr>
-            <td><%= player.player_id %></td>
-            <td><%= player.name %></td>
-            <td><%= player.position %></td>
-            <td><%= player.team %></td>
-            <td><%= player.stats %></td>
-            <td><%= player.proj %></td>
-            <td>
-              <%= form_for(player) do |f| %>
-                <%= f.submit "Draft", name: 'draft', data: { confirm: "Are you drafting?" } %>
-              <% end %>
-            </td>
-            <td>
-              <%= form_for(player) do |f| %>
-                <%= f.submit "Remove", name: 'remove', data: { confirm: "Are you removing?" } %>
-              <% end %>
-            </td>
+            <th>ESPN ID</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Team</th>
+            <th>Stat</th>
+            <th>Projection</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+      
+        <tbody>
+          <% array.each do |player| %>
+            <tr>
+              <td><%= espn(player) %></td>
+              <td><%= player.name %></td>
+              <td><%= player.position %></td>
+              <td><%= player.team %></td>
+              <td><%= player.stats %></td>
+              <td><%= player.proj %></td>
+              <td>
+                <%= form_for(player) do |f| %>
+                  <%= f.submit "Draft", name: 'draft', data: { confirm: "Are you drafting?" } %>
+                <% end %>
+              </td>
+              <td>
+                <%= form_for(player) do |f| %>
+                  <%= f.submit "Remove", name: 'remove', data: { confirm: "Are you removing?" } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   </div>
   <div style="margin-left: 60%">
     <h1>Drafted players</h1>
@@ -64,7 +66,7 @@
       <tbody>
         <% @starting_players.each do |player| %>
           <tr>
-            <td><%= player.player_id %></td>
+            <td><%= espn(player) %></td>
             <td><%= player.name %></td>
             <td><%= player.position %></td>
             <td><%= player.team %></td>

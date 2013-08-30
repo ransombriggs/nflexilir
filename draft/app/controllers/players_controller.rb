@@ -101,12 +101,14 @@ class PlayersController < ApplicationController
       raise "bad order"
     end
 
-    @available_players = Player.where(claimed_by: nil).order("#{order} desc").reduce([]) {|acc, player|
+    all_available_players = Player.where(claimed_by: nil).order("#{order} desc")
+    @highest_ranked = all_available_players[0..10]
+    @available_players = all_available_players.reduce([]) {|acc, player|
       if (valid_positions.find {|position| match.call(position, player.position)}) 
         acc << player
       end
       acc
-    }
+    }[0..10]
     @removed_players = Player.where(claimed_by: 0).order("claim_time asc")
   end
 
