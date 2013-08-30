@@ -10,14 +10,18 @@ class PlayersController < ApplicationController
   # PATCH/PUT /players/1
   # PATCH/PUT /players/1.json
   def update
+    if params[:draft]
+      @player.claimed_by = 1
+    elsif params[:remove]
+      @player.claimed_by = 0
+    else
+      raise "Expecting draft or remove"
+    end
+
+    @player.save!
     respond_to do |format|
-      if @player.update(player_params)
-        format.html { redirect_to @player, notice: 'Player was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @player.errors, status: :unprocessable_entity }
-      end
+      format.html { redirect_to players_url, notice: 'Player was successfully updated.' }
+      format.json { head :no_content }
     end
   end
 
