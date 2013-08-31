@@ -115,12 +115,12 @@ class PlayersController < ApplicationController
     starter_positions_dup.delete("D/ST")
     starter_positions_dup.delete("K")
     if (starter_positions_dup.empty?)
-      @exclude_kicker_defense = select_players(all_available_players, bench_positions)[0..10]
+      @exclude_kicker_defense = select_players(all_available_players, bench_positions, 10)
     else
       @exclude_kicker_defense = []
     end
 
-    @available_players = select_players(all_available_players, valid_positions)[0..10]
+    @available_players = select_players(all_available_players, valid_positions, 10)
 
     @removed_players = Player.includes(:team).where(claimed_by: 0).order("claim_time asc")
   end
@@ -149,13 +149,17 @@ class PlayersController < ApplicationController
       position == key || (key == "WR/TE" && (["WR", "TE"].include?(position)))
     end
 
-    def select_players(players, positions)
-      players.reduce([]) {|acc, player|
+    def select_players(players, positions, max)
+      select = []
+      players.each {|player|
         if (positions.find {|position| match(position, player.position)}) 
-          acc << player
+          select << player
+          if (select.size == max)
+            break
+          end
         end
-        acc
       }
+      select
     end
 
     # Use callbacks to share common setup or constraints between actions.
