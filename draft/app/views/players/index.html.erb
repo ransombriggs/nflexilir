@@ -17,6 +17,7 @@
             <th>Name</th>
             <th>Position</th>
             <th>Team</th>
+            <th>Bye</th>
             <th>Stat</th>
             <th>Projection</th>
             <th>&nbsp;</th>
@@ -31,6 +32,7 @@
               <td><%= player.name %></td>
               <td><%= player.position %></td>
               <td><%= player.team.name %></td>
+              <td><%= player.team.bye %></td>
               <td><%= player.stats %></td>
               <td><%= player.proj %></td>
               <td>
@@ -58,6 +60,7 @@
           <th>Name</th>
           <th>Position</th>
           <th>Team</th>
+          <th>Bye</th>
           <th>Stat</th>
           <th>Projection</th>
         </tr>
@@ -70,12 +73,13 @@
             <td><%= player.name %></td>
             <td><%= player.position %></td>
             <td><%= player.team.name %></td>
+            <td><%= player.team.bye %></td>
             <td><%= player.stats %></td>
             <td><%= player.proj %></td>
           </tr>
         <% end %>
           <tr>
-            <td colspan="6" style="text-align: center">Benched</td>
+            <td colspan="7" style="text-align: center">Benched</td>
           </tr>
          <% @benched_players.each do |player| %>
           <tr>
@@ -83,6 +87,7 @@
             <td><%= player.name %></td>
             <td><%= player.position %></td>
             <td><%= player.team.name %></td>
+            <td><%= player.team.bye %></td>
             <td><%= player.stats %></td>
             <td><%= player.proj %></td>
           </tr>
