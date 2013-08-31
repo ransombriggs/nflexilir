@@ -19,6 +19,17 @@ class PlayersController < ApplicationController
     drafted_players_list = Player.includes(:team).where(claimed_by: 1).order("claim_time asc")
     drafted_players_size = drafted_players_list.size
 
+    @bye_weeks = {}
+    ::PlayersController.roster.each do |(k,v)|
+      if (k != "WR/TE")
+        @bye_weeks[k] = Set.new
+      end
+    end
+
+    drafted_players_list.each do |player|
+      @bye_weeks[player.position] << player.team.bye
+    end
+
     @starting_players = []
     @benched_players  = []
 
@@ -93,7 +104,7 @@ class PlayersController < ApplicationController
 
     order = params[:order] || 'proj'
 
-    unless ['proj', 'stats'].find(order)
+    unless ['proj', 'stats'].include?(order)
       raise "bad order"
     end
 
@@ -135,7 +146,7 @@ class PlayersController < ApplicationController
 
   private
     def match(key, position)
-      position == key || (key == "WR/TE" && (["WR", "TE"].find{|k| k == position}))
+      position == key || (key == "WR/TE" && (["WR", "TE"].include?(position)))
     end
 
     def select_players(players, positions)
