@@ -11,7 +11,7 @@
         <h1>Available players</h1>
         <%= link_to 'Projection', players_path(order: 'proj') %> |
         <%= link_to 'Statistics', players_path(order: 'stats') %>
-        <% [@available_players, @highest_ranked].each do |array| %>
+        <% [@available_players, @exclude_kicker_defense, @highest_ranked].each do |array| %>
           <table>
             <thead>
               <tr>

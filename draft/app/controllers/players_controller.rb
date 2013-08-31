@@ -103,6 +103,21 @@ class PlayersController < ApplicationController
 
     all_available_players = Player.includes(:team).where(claimed_by: nil).order("#{order} desc")
     @highest_ranked = all_available_players
+  
+    starter_positions_dup = Set.new(starter_positions)
+    starter_positions_dup.delete("D/ST")
+    starter_positions_dup.delete("K")
+    if (starter_positions_dup.empty?)
+      @exclude_kicker_defense = all_available_players.reduce([]) {|acc, player|
+        if (bench_positions.find {|position| match.call(position, player.position)}) 
+          acc << player
+        end
+        acc
+      }[0..10]
+    else
+      @exclude_kicker_defense = []
+    end
+
     @available_players = all_available_players.reduce([]) {|acc, player|
       if (valid_positions.find {|position| match.call(position, player.position)}) 
         acc << player
