@@ -25,15 +25,11 @@ class PlayersController < ApplicationController
     starter_positions = []
     bench_positions = []
 
-    match = lambda {|key, position| 
-      position == key || (key == "WR/TE" && (["WR", "TE"].find{|k| k == position}))
-    }
-
     ::PlayersController.roster.each do |(key,value)|
       count = 0
       (start_limit, _) = value
       drafted_players_list = drafted_players_list.reduce([]) {|dacc, player|
-        if (match.call(key, player.position))
+        if (match(key, player.position))
           count += 1
           if (count <= start_limit)
             @starting_players << player
@@ -59,7 +55,7 @@ class PlayersController < ApplicationController
         limit = 0
       end
       drafted_players_list = drafted_players_list.reduce([]) {|dacc, player|
-        if (match.call(key, player.position))
+        if (match(key, player.position))
           count += 1
           if (count <= limit)
             @benched_players << player
@@ -108,22 +104,13 @@ class PlayersController < ApplicationController
     starter_positions_dup.delete("D/ST")
     starter_positions_dup.delete("K")
     if (starter_positions_dup.empty?)
-      @exclude_kicker_defense = all_available_players.reduce([]) {|acc, player|
-        if (bench_positions.find {|position| match.call(position, player.position)}) 
-          acc << player
-        end
-        acc
-      }[0..10]
+      @exclude_kicker_defense = select_players(all_available_players, bench_positions)[0..10]
     else
       @exclude_kicker_defense = []
     end
 
-    @available_players = all_available_players.reduce([]) {|acc, player|
-      if (valid_positions.find {|position| match.call(position, player.position)}) 
-        acc << player
-      end
-      acc
-    }[0..10]
+    @available_players = select_players(all_available_players, valid_positions)[0..10]
+
     @removed_players = Player.includes(:team).where(claimed_by: 0).order("claim_time asc")
   end
 
@@ -147,6 +134,19 @@ class PlayersController < ApplicationController
   end
 
   private
+    def match(key, position)
+      position == key || (key == "WR/TE" && (["WR", "TE"].find{|k| k == position}))
+    end
+
+    def select_players(players, positions)
+      players.reduce([]) {|acc, player|
+        if (positions.find {|position| match(position, player.position)}) 
+          acc << player
+        end
+        acc
+      }
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_player
       @player = Player.find(params[:id])
