@@ -4,113 +4,117 @@
     <h3 class="info_box"><%= flash[:notice] %></h3>
   </div>
 <% end %>
-<div>
-  <div style="float: left; width: 50%">
-    <h1>Available players</h1>
-    <%= link_to 'Projection', players_path(order: 'proj') %> |
-    <%= link_to 'Statistics', players_path(order: 'stats') %>
-    <% [@available_players, @highest_ranked].each do |array| %>
-      <table>
-        <thead>
-          <tr>
-            <th>ESPN ID</th>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Team</th>
-            <th>Bye</th>
-            <th>Stat</th>
-            <th>Projection</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-      
-        <tbody>
-          <% array.each do |player| %>
+<table>
+  <tbody>
+    <tr>
+      <td style="width: 49%; vertical-align: top">
+        <h1>Available players</h1>
+        <%= link_to 'Projection', players_path(order: 'proj') %> |
+        <%= link_to 'Statistics', players_path(order: 'stats') %>
+        <% [@available_players, @highest_ranked].each do |array| %>
+          <table>
+            <thead>
+              <tr>
+                <th>ESPN ID</th>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Team</th>
+                <th>Bye</th>
+                <th>Stat</th>
+                <th>Projection</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+          
+            <tbody>
+              <% array.each do |player| %>
+                <tr>
+                  <td><%= espn(player) %></td>
+                  <td><%= player.name %></td>
+                  <td><%= player.position %></td>
+                  <td><%= player.team.name %></td>
+                  <td><%= player.team.bye %></td>
+                  <td><%= player.stats %></td>
+                  <td><%= player.proj %></td>
+                  <td>
+                    <%= form_for(player) do |f| %>
+                      <%= f.submit "Draft", name: 'draft', data: { confirm: "Are you drafting?" } %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= form_for(player) do |f| %>
+                      <%= f.submit "Remove", name: 'remove', data: { confirm: "Are you removing?" } %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+      </td>
+      <td style="width:49%; vertical-align: top">
+        <h1>Drafted players</h1>
+        <table>
+          <thead>
             <tr>
-              <td><%= espn(player) %></td>
-              <td><%= player.name %></td>
-              <td><%= player.position %></td>
-              <td><%= player.team.name %></td>
-              <td><%= player.team.bye %></td>
-              <td><%= player.stats %></td>
-              <td><%= player.proj %></td>
-              <td>
-                <%= form_for(player) do |f| %>
-                  <%= f.submit "Draft", name: 'draft', data: { confirm: "Are you drafting?" } %>
-                <% end %>
-              </td>
-              <td>
-                <%= form_for(player) do |f| %>
-                  <%= f.submit "Remove", name: 'remove', data: { confirm: "Are you removing?" } %>
-                <% end %>
-              </td>
+              <th>ESPN ID</th>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Team</th>
+              <th>Bye</th>
+              <th>Stat</th>
+              <th>Projection</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% end %>
-  </div>
-  <div style="margin-left: 60%">
-    <h1>Drafted players</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>ESPN ID</th>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Team</th>
-          <th>Bye</th>
-          <th>Stat</th>
-          <th>Projection</th>
-        </tr>
-      </thead>
-    
-      <tbody>
-        <% @starting_players.each do |player| %>
-          <tr>
-            <td><%= espn(player) %></td>
-            <td><%= player.name %></td>
-            <td><%= player.position %></td>
-            <td><%= player.team.name %></td>
-            <td><%= player.team.bye %></td>
-            <td><%= player.stats %></td>
-            <td><%= player.proj %></td>
-          </tr>
-        <% end %>
-          <tr>
-            <td colspan="7" style="text-align: center">Benched</td>
-          </tr>
-         <% @benched_players.each do |player| %>
-          <tr>
-            <td><%= player.player_id %></td>
-            <td><%= player.name %></td>
-            <td><%= player.position %></td>
-            <td><%= player.team.name %></td>
-            <td><%= player.team.bye %></td>
-            <td><%= player.stats %></td>
-            <td><%= player.proj %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <h1>Removed players</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>ESPN ID</th>
-          <th>Name</th>
-        </tr>
-      </thead>
-    
-      <tbody>
-        <% @removed_players.each do |player| %>
-          <tr>
-            <td><%= player.player_id %></td>
-            <td><%= player.name %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-</div>
+          </thead>
+        
+          <tbody>
+            <% @starting_players.each do |player| %>
+              <tr>
+                <td><%= espn(player) %></td>
+                <td><%= player.name %></td>
+                <td><%= player.position %></td>
+                <td><%= player.team.name %></td>
+                <td><%= player.team.bye %></td>
+                <td><%= player.stats %></td>
+                <td><%= player.proj %></td>
+              </tr>
+            <% end %>
+              <tr>
+                <td colspan="7" style="text-align: center">Benched</td>
+              </tr>
+             <% @benched_players.each do |player| %>
+              <tr>
+                <td><%= player.player_id %></td>
+                <td><%= player.name %></td>
+                <td><%= player.position %></td>
+                <td><%= player.team.name %></td>
+                <td><%= player.team.bye %></td>
+                <td><%= player.stats %></td>
+                <td><%= player.proj %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <h1>Removed players</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>ESPN ID</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+        
+          <tbody>
+            <% @removed_players.each do |player| %>
+              <tr>
+                <td><%= player.player_id %></td>
+                <td><%= player.name %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
