@@ -11,7 +11,7 @@ class Parse
   end
 
   def self.load
-    if (Player.count > 0)
+    if (Player.count > 0 || Team.count > 0)
       raise "Already loaded"
     end
     sorted = Dir.glob("#{Cache.location}/*.html").sort do |a, b|
@@ -19,6 +19,16 @@ class Parse
     end
     
     players = []
+    team_data = JSON.parse(File.read("#{Rails.root}/data/teams.json"))
+    teams = team_data["bye"].inject({}) do |acc, (name,bye)|
+      team = Team.new
+      team.name = name
+      team.bye = bye
+
+      acc[name] = team
+      acc
+    end
+
     sorted.each do |filename|
       f = File.open(filename)
       doc = Nokogiri::HTML(f)
@@ -34,13 +44,17 @@ class Parse
         player.stats = get(trs[0], "td.appliedPoints", 1)[0].text.to_f
         player.proj = get(trs[1], "td.appliedPoints", 1)[0].text.to_f
         if player_link.next_sibling.text =~ /^\*?, ([A-Za-z]+) ([A-Za-z\/]+)$/
-          player.team = $1
+          team_name = $1
           player.position = $2
           player.name = player_link.text
         elsif player_link.next_sibling.text =~ /^ (D\/ST)$/
           player.position = $1
-          player.team = "LOOKUP"
           if player_link.text =~ /^(.*) D\/ST$/
+            if (team_data["defense"][$1])
+              team_name = team_data["defense"][$1]
+            else
+              raise "Could not find #{$1} in team data"
+            end
             player.name = $1
           else
             raise "Did not match " + player_link.text
@@ -48,10 +62,18 @@ class Parse
         else
           raise "Did not match " + filename + " " + player_link.next_sibling.text
         end
+        if (teams.keys.find{|team| team == team_name})
+          player.team = teams[team_name]
+        else
+          raise "Could not find #{$team_name} in bye data"
+        end
         players << player
       end
     end
     ActiveRecord::Base.transaction do
+      teams.values.each do |team|
+        team.save!
+      end
       players.each do |player|
         player.save!
       end

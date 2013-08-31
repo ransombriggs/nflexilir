@@ -16,7 +16,7 @@ class PlayersController < ApplicationController
   # GET /players
   # GET /players.json
   def index
-    drafted_players_list = Player.where(claimed_by: 1).order("claim_time asc")
+    drafted_players_list = Player.includes(:team).where(claimed_by: 1).order("claim_time asc")
     drafted_players_size = drafted_players_list.size
 
     @starting_players = []
@@ -101,15 +101,15 @@ class PlayersController < ApplicationController
       raise "bad order"
     end
 
-    all_available_players = Player.where(claimed_by: nil).order("#{order} desc")
-    @highest_ranked = all_available_players[0..10]
+    all_available_players = Player.includes(:team).where(claimed_by: nil).order("#{order} desc")
+    @highest_ranked = all_available_players
     @available_players = all_available_players.reduce([]) {|acc, player|
       if (valid_positions.find {|position| match.call(position, player.position)}) 
         acc << player
       end
       acc
     }[0..10]
-    @removed_players = Player.where(claimed_by: 0).order("claim_time asc")
+    @removed_players = Player.includes(:team).where(claimed_by: 0).order("claim_time asc")
   end
 
   # PATCH/PUT /players/1
