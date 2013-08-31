@@ -11,23 +11,26 @@
         <h1>Available players</h1>
         <%= link_to 'Projection', players_path(order: 'proj') %> |
         <%= link_to 'Statistics', players_path(order: 'stats') %>
-        <% [@available_players, @exclude_kicker_defense, @highest_ranked].each do |array| %>
-          <table>
-            <thead>
+        <table>
+          <thead>
+            <tr>
+              <th>ESPN ID</th>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Team</th>
+              <th>Bye</th>
+              <th>Stat</th>
+              <th>Projection</th>
+              <th>&nbsp;</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+        
+          <tbody>
+            <% [@available_players, @exclude_kicker_defense, @highest_ranked].each do |array| %>
               <tr>
-                <th>ESPN ID</th>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Team</th>
-                <th>Bye</th>
-                <th>Stat</th>
-                <th>Projection</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
+                <td colspan="9"><hr/></td>
               </tr>
-            </thead>
-          
-            <tbody>
               <% array.each do |player| %>
                 <tr>
                   <td><%= espn(player) %></td>
@@ -49,9 +52,9 @@
                   </td>
                 </tr>
               <% end %>
-            </tbody>
-          </table>
-        <% end %>
+            <% end %>
+          </tbody>
+        </table>
       </td>
       <td style="width:49%; vertical-align: top">
         <h1>Drafted players</h1>
