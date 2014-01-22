@@ -80,8 +80,93 @@ for player in q.game(season_year=2013, season_type='Regular').as_players():
 		# print "game: ", game_stat
 		player_stats[player.position][player.player_id] += game_stat
 
+l = lambda t: (player_objs[t[0]], t[1])
+
+sorted_player_stats = dict()
+
 for f in player_stats:
-	print f
-	for t in sorted(player_stats[f].items(), key=lambda x: x[1], reverse = True)[0:10]:
-		print player_objs[t[0]], t[1]
+	sorted_player_stats[f] = map(l, sorted(player_stats[f].items(), key=lambda x: x[1], reverse = True))
+
+class PickPosition:
+
+	def __init__(self):
+		self.players = dict()
+		self.max_players = dict()
+
+		for i in valid_positions:
+			self.players[i] = []
+
+		self.max_players[nfldb.Enums.player_pos.QB] = 1
+		self.max_players[nfldb.Enums.player_pos.WR] = 3
+		self.max_players[nfldb.Enums.player_pos.RB] = 3
+
+	def custom_position_pick(self, player_hash, available_positions):
+        	raise NotImplementedError("Please Implement this method")
+
+	def players(self):
+		return self.players
+
+	def final_score(self):
+		total = 0
+		for i in self.players:
+			for j in self.players[i]:
+				total += j[1]
+		return total
+
+	def pick_player(self, player_hash):
+		available_positions = []
+		for i in self.players:
+			if len(self.players[i]) < self.max_players[i]:
+				available_positions.append(i)
+		picked_position = self.custom_position_pick(player_hash, available_positions)
+		picked_player = player_hash[picked_position].pop(0)
+		self.players[picked_position].append(picked_player)
+		return picked_player
+
+class PickPositionSimple(PickPosition):
+
+	def custom_position_pick(self, player_hash, available_positions):
+		max_score = 0
+		max_position = None
+		for i in available_positions:
+			if player_hash[i][0][1] > max_score:
+				max_score = player_hash[i][0][1]
+				max_position = i
+		return max_position
+
+class PickPositionPlateau(PickPosition):
+
+	def custom_position_pick(self, player_hash, available_positions):
+		max_score = 0
+		max_position = None
+		for i in available_positions:
+			diff = player_hash[i][0][1] - player_hash[i][10][1] 
+			if diff > max_score:
+				max_score = diff
+				max_position = i
+		return max_position
+
+players = []
+for i in range(0, 12):
+	if i == 3:
+		players.append(PickPositionPlateau())
+	else:
+		players.append(PickPositionSimple())
+
+num11 = 0
+for i in range(0, 7):
+	if i == 2 or i % 2 == 1:
+		start = 11
+		end = -1
+		inc = -1
+	else:
+		start = 0
+		end = 12
+		inc = 1
+
+	for j in range(start, end, inc):
+		players[j].pick_player(sorted_player_stats)
+
+for i in range(0, 12):
+	print players[i].final_score()
 
