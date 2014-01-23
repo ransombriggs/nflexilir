@@ -1,0 +1,4 @@
+set style data linespoints
+set key autotitle columnhead
+plot 'plateaus.dat' using 2:xticlabel(1) index 0, '' using 2:xticlabel(1) index 1, '' using 2:xticlabel(1) index 2
+pause -1 "<cr> to plot again using x2ticlabels"

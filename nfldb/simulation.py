@@ -87,6 +87,21 @@ sorted_player_stats = dict()
 for f in player_stats:
 	sorted_player_stats[f] = map(l, sorted(player_stats[f].items(), key=lambda x: x[1], reverse = True))
 
+p = open('plateaus.dat', 'w')
+
+for f in sorted_player_stats:
+	p.write('DEPTH ')
+	p.write(str(f))
+	p.write('\n')
+
+	for d in range(12, 0, -1):
+		p.write(str(d))
+		p.write(' ')
+		p.write(str(int(sorted_player_stats[f][0][1] - sorted_player_stats[f][d][1])))
+		p.write('\n')
+	p.write('\n\n')
+p.close()
+
 class PickPosition:
 
 	def __init__(self):
