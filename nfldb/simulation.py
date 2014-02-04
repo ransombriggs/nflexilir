@@ -3,6 +3,7 @@ import sys
 
 db = nfldb.connect()
 
+drafted_players = dict()
 player_objs = dict()
 player_stats = dict()
 
@@ -47,10 +48,18 @@ multipliers["fumbles_tot"] = -1
 
 valid_positions = nfldb.Enums.player_pos.QB, nfldb.Enums.player_pos.WR, nfldb.Enums.player_pos.RB, nfldb.Enums.player_pos.TE
 
+p = open('players.txt', 'r')
+for line in p:
+	drafted_players[line.rstrip()] = 1
+p.close()
+
 q = nfldb.Query(db)
 for player in q.game(season_year=2013, season_type='Regular').as_players():
 
 	player_objs[player.player_id] = player
+
+	if player.player_id in drafted_players:
+		continue;
 
 	if player.position not in valid_positions:
 		continue
@@ -86,6 +95,13 @@ sorted_player_stats = dict()
 
 for f in player_stats:
 	sorted_player_stats[f] = map(l, sorted(player_stats[f].items(), key=lambda x: x[1], reverse = True))
+
+for f in player_stats:
+	print f
+	for i in range(0, 36):
+		if (i % 6 == 0 and i > 0):
+			print str(int(sorted_player_stats[f][0][1] - sorted_player_stats[f][i][1]))
+		print sorted_player_stats[f][i][0], sorted_player_stats[f][i][1]
 
 p = open('plateaus.dat', 'w')
 
