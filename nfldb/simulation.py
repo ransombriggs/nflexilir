@@ -45,7 +45,7 @@ multipliers["fumbles_tot"] = -1
 # fixme kicking
 # fixme defense 
 
-valid_positions = nfldb.Enums.player_pos.QB, nfldb.Enums.player_pos.WR, nfldb.Enums.player_pos.RB
+valid_positions = nfldb.Enums.player_pos.QB, nfldb.Enums.player_pos.WR, nfldb.Enums.player_pos.RB, nfldb.Enums.player_pos.TE
 
 q = nfldb.Query(db)
 for player in q.game(season_year=2013, season_type='Regular').as_players():
@@ -114,6 +114,7 @@ class PickPosition:
 		self.max_players[nfldb.Enums.player_pos.QB] = 1
 		self.max_players[nfldb.Enums.player_pos.WR] = 3
 		self.max_players[nfldb.Enums.player_pos.RB] = 3
+		self.max_players[nfldb.Enums.player_pos.TE] = 1
 
 	def custom_position_pick(self, player_hash, available_positions):
         	raise NotImplementedError("Please Implement this method")
