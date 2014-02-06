@@ -50,7 +50,8 @@ valid_positions = nfldb.Enums.player_pos.QB, nfldb.Enums.player_pos.WR, nfldb.En
 
 p = open('players.txt', 'r')
 for line in p:
-	drafted_players[line.rstrip()] = 1
+	player = line.partition('#')[0].rstrip()
+	drafted_players[player] = 1
 p.close()
 
 q = nfldb.Query(db)

@@ -1,3 +1,20 @@
-00-0025389
-00-0030485
-00-0027942
+00-0025389 # Calvin Johnson
+00-0030485 # Eddie Lacy
+00-0027942 # A.J. Green
+00-0026213 # Jamaal Charles
+00-0027696 # Jimmy Graham
+00-0027029 # LeSean McCoy
+00-0030456 # Gio Bernard
+00-0027902 # Dez Bryant
+00-0029664 # Josh Gordon
+00-0026184 # Matt Forte
+00-0025394 # Adrian Peterson (MIN, RB)
+00-0029613 # Doug Martin
+00-0027944 # Julio Jones
+00-0027874 # Demaryius Thomas
+00-0023459 # Aaron Rodgers
+00-0029668 # Andrew Luck
+00-0027939 # Cam Newton
+00-0029137 # Alshon Jeffery
+00-0024334 # Brandon Marshall (CHI, WR)
+00-0020531 # Drew Brees
