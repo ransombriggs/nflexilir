@@ -179,6 +179,8 @@ class PickPositionPlateau(PickPosition):
 				max_position = i
 		return max_position
 
+sys.exit()
+
 players = []
 for i in range(0, 12):
 	if i == 3:
