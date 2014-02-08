@@ -19,3 +19,19 @@
 00-0024334 # Brandon Marshall (CHI, WR)
 00-0020531 # Drew Brees
 00-0010346 # Peyton Manning -- FAKE --
+00-0027793 # Antonio Brown
+00-0030496 # Le'Veon Bell
+00-0028002 # Randall Cobb
+00-0027861 # C.J. Spiller
+00-0027656 # Rob Gronkowski
+00-0026176 # Jordy Nelson
+00-0025399 # Marshawn Lynch
+00-0030279 # Keenan Allen
+00-0029141 # Alfred Morris
+00-0026345 # Pierre Garcon
+00-0024217 # Reggie Bush
+00-0028009 # DeMarco Murray
+00-0030536 # Zac Stacy
+00-0028067 # Julius Thomas
+00-0026195 # Ray Rice
+00-0030578 # Cordarrelle Patterson
