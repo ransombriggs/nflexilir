@@ -60,7 +60,11 @@ class Parse
             raise "Did not match " + player_link.text
           end
         else
-          raise "Did not match " + filename + " " + player_link.next_sibling.text
+          if "Dexter McCluster".eql?(player_link.text) || "MarQueis Gray".eql?(player_link.text)
+            next
+          else
+            raise "Did not match " + filename + " " + player_link.next_sibling.text
+          end
         end
         if (teams.keys.find{|team| team == team_name})
           player.team = teams[team_name]
