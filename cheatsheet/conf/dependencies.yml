@@ -2,3 +2,4 @@
 
 require:
     - play
+    - org.codehaus.jackson -> jackson-jaxrs 1.9.11

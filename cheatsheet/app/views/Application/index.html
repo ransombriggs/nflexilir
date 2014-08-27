@@ -1,4 +1,13 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-#{welcome /}
+#{players header:'Rank', players: sortedByRank, form: true /}
+#{players header:'Projection', players: sortedByProj /}
+#{players header:'RB', players: availableRunningBacks, diff: true /}
+#{players header:'WR', players: availableWideReceivers, diff: true /}
+#{players header:'QB', players: availableQuarterBacks, diff: true /}
+#{players header:'TE', players: availableTightEnds, diff: true /}
+#{players header:'K', players: availableKickers, diff: true /}
+#{players header:'D', players: availableDefense, diff: true /}
+#{players header:'Drafted', players: draftedPlayers, position: true /}
+

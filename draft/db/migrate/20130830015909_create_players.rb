@@ -8,6 +8,7 @@ class CreatePlayers < ActiveRecord::Migration
       t.integer :proj
       t.integer :player_id
       t.integer :claimed_by
+      t.integer :rank
       t.datetime :claim_time
       t.timestamps
     end

@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20130831004519) do
     t.integer  "proj"
     t.integer  "player_id"
     t.integer  "claimed_by"
+    t.integer  "rank"
     t.datetime "claim_time"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -43,6 +43,8 @@ class Parse
         player.player_id = player_link.attr("playerid").to_i
         player.stats = get(trs[0], "td.appliedPoints", 1)[0].text.to_f
         player.proj = get(trs[1], "td.appliedPoints", 1)[0].text.to_f
+        player_link.previous_sibling.text =~ /^(\d+)\./
+        player.rank = $1.to_i
         if player_link.next_sibling.text =~ /^\*?, ([A-Za-z]+) ([A-Za-z\/]+)$/
           team_name = $1
           player.position = $2
@@ -74,6 +76,9 @@ class Parse
         players << player
       end
     end
+    filename = "#{Cache.location}/players.json"
+    File.open(filename, 'wb') {|f| f.write(players.to_json) }
+    
     ActiveRecord::Base.transaction do
       teams.values.each do |team|
         team.save!
@@ -82,6 +87,7 @@ class Parse
         player.save!
       end
     end
+    
     nil
   end
 
