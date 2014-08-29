@@ -69,7 +69,9 @@ public class Application extends Controller {
             }
         }
 
-        render(sortedByRank, sortedByProj, availableQuarterBacks, availableRunningBacks, availableWideReceivers, availableTightEnds, availableDefense, availableKickers, draftedPlayers);
+        long totalDrafted = allPlayers.size() - availablePlayers.size();
+
+        render(sortedByRank, sortedByProj, availableQuarterBacks, availableRunningBacks, availableWideReceivers, availableTightEnds, availableDefense, availableKickers, draftedPlayers, totalDrafted);
     }
 
     public static void update(Long player, String draft, String remove) {
@@ -91,6 +93,24 @@ public class Application extends Controller {
             player._save();
         }
         renderJSON(list);
+    }
+
+    public static void loadTiers() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType javaType = mapper.getTypeFactory().constructMapType(Map.class, String.class, Long.class);
+        Map<String, Long> map = mapper.readValue(new File("/home/rbriggs/git/nflexilir/draft/cache/tiers.json"), javaType);
+        for (Map.Entry<String, Long> entry: map.entrySet()) {
+            Player player = Player.find("byName", entry.getKey()).first();
+            if (entry.getKey().equals("Dexter McCluster")) {
+                continue;
+            }
+            if (player == null) {
+                throw new IllegalArgumentException(entry.getKey());
+            }
+            player.tier = entry.getValue();
+            player.save();
+        }
+        renderJSON(map);
     }
 
 }

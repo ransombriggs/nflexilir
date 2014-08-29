@@ -21,6 +21,7 @@ public class Player extends Model {
     public Long player_id;
     public Long claimed_by;
     public Long rank;
+    public Long tier;
 
     public Date claim_time;
 }

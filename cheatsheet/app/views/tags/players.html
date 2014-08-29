@@ -2,10 +2,18 @@
 <h3>${_header}</h3>
 %{ i = 0 }%
 #{list items:_players, as:'player'}
-    <div>
-        ${player.name} ${player.proj}
+    <div class="tier${player.tier}">
+        <a href="http://espn.go.com/nfl/player/_/id/${player.player_id}/">${player.name}</a> ${player.proj}
+        %{ if (player.tier != null) { }%
+            (${player.tier})
+        %{ } }%
+        %{ if (player.rank && _totalDrafted != null) { }%
+            %{ if (_totalDrafted > player.rank) { }%
+                *${_totalDrafted - player.rank}*
+            %{ } }%
+        %{ } }%
         %{ if (_diff && i % 5 == 0 && i > 0) { }%
-            (${_players.get(0).proj - player.proj})
+            << ${_players.get(0).proj - player.proj} >>
         %{ } }%
         %{ if (_form) { }%
             #{form @Application.update()}

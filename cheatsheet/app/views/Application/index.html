@@ -1,7 +1,7 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-#{players header:'Rank', players: sortedByRank, form: true /}
+#{players header:'Rank', players: sortedByRank, form: true, totalDrafted: totalDrafted /}
 #{players header:'Projection', players: sortedByProj /}
 #{players header:'RB', players: availableRunningBacks, diff: true /}
 #{players header:'WR', players: availableWideReceivers, diff: true /}

@@ -1,4 +1,5 @@
 require('nokogiri')
+require 'json'
 
 class Parse
 
@@ -91,8 +92,50 @@ class Parse
     nil
   end
 
+  def self.load_tiers
+    sorted = Dir.glob("#{Cache.location}/tiers/*.html")
+
+    players = {}
+    
+    sorted.each do |filename|
+      f = File.open(filename)
+      doc = Nokogiri::HTML(f)
+      f.close
+
+      columns = nil
+      baseline = 0
+      tiers = []
+      doc.css("tr").each do |player_row|
+        if player_row['class'] == 'subtitle' 
+          unless columns.nil?
+            baseline += columns
+          end
+          columns = player_row.css("td").size
+          columns.times do 
+            tiers << []
+          end
+        end
+        if player_row['class'] == 'row1' || player_row['class'] == 'row2'
+          tds = player_row.css("td")
+          (0..columns).each do |i|
+            unless tds[i].nil?
+              text = tds[i].text.strip
+              unless text.eql?(" ")
+                if players[text]
+                  raise
+                else 
+                  players[text] = baseline + i
+                end
+                tiers[baseline + i] << text
+              end
+            end
+          end
+        end
+      end
+      puts JSON.pretty_generate(tiers)
+    end
+    filename = "#{Cache.location}/tiers.json"
+    File.open(filename, 'wb') {|f| f.write(players.to_json) }
+  end
+
 end
-
-
-
-
