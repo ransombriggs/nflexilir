@@ -18,6 +18,7 @@ public class Application extends Controller {
     public static void index() {
         List<Player> allPlayers = Player.find("proj > 0").fetch();
         List<Player> draftedPlayers = new ArrayList<Player>(allPlayers.size());
+        List<Player> allDraftedPlayers = new ArrayList<Player>(allPlayers.size());
         List<Player> availablePlayers = new ArrayList<Player>(allPlayers.size());
 
         for (Player player: allPlayers) {
@@ -25,6 +26,10 @@ public class Application extends Controller {
                 availablePlayers.add(player);
             } else if (player.claimed_by.equals(1L)) {
                 draftedPlayers.add(player);
+            }
+
+            if (player.claim_time != null) {
+                allDraftedPlayers.add(player);
             }
         }
 
@@ -41,6 +46,13 @@ public class Application extends Controller {
             @Override
             public int compare(Player o1, Player o2) {
                 return o2.proj.compareTo(o1.proj);
+            }
+        });
+
+        Collections.sort(allDraftedPlayers, new Comparator<Player>() {
+            @Override
+            public int compare(Player o1, Player o2) {
+                return o2.claim_time.compareTo(o1.claim_time);
             }
         });
 
@@ -71,7 +83,7 @@ public class Application extends Controller {
 
         long totalDrafted = allPlayers.size() - availablePlayers.size();
 
-        render(sortedByRank, sortedByProj, availableQuarterBacks, availableRunningBacks, availableWideReceivers, availableTightEnds, availableDefense, availableKickers, draftedPlayers, totalDrafted);
+        render(sortedByRank, sortedByProj, availableQuarterBacks, availableRunningBacks, availableWideReceivers, availableTightEnds, availableDefense, availableKickers, draftedPlayers, totalDrafted, allDraftedPlayers);
     }
 
     public static void update(Long player, String draft, String remove) {
@@ -81,6 +93,7 @@ public class Application extends Controller {
         } else if (remove != null) {
             playerModel.claimed_by = 0L;
         }
+        playerModel.claim_time = new Date();
         playerModel._save();
         index();
     }
