@@ -7,7 +7,7 @@ class Scrape
 
   def self.scrape(cookie)
 
-    uri = URI("http://games.espn.go.com/ffl/tools/projections?display=alt&leagueId=728379&startIndex=0")
+    uri = URI("http://games.espn.go.com/ffl/tools/projections?display=alt&leagueId=591704&startIndex=0")
     
     while (uri)
       startIndex = CGI::parse(uri.query)["startIndex"][0]
